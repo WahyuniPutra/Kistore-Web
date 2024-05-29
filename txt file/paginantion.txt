@@ -1,0 +1,60 @@
+<?php
+include 'koneksi.php';
+
+// Set the number of products to display per page
+$productsPerPage = 10;
+
+// Get the current page number from the URL parameter
+$currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
+
+// Calculate the OFFSET for the SQL query based on the current page
+$offset = ($currentPage - 1) * $productsPerPage;
+
+// Query to fetch products with LIMIT and OFFSET
+$query = "SELECT * FROM tb_produk LIMIT $productsPerPage OFFSET $offset";
+$result = mysqli_query($conn, $query);
+
+// Query to get the total number of products
+$totalProductsQuery = "SELECT COUNT(*) as total FROM tb_produk";
+$totalProductsResult = mysqli_query($conn, $totalProductsQuery);
+$totalProductsRow = mysqli_fetch_assoc($totalProductsResult);
+$totalProducts = $totalProductsRow['total'];
+
+// Calculate the total number of pages
+$totalPages = ceil($totalProducts / $productsPerPage);
+?>
+
+<!-- Display list of products -->
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Display Name</th>
+        <th>Price</th>
+        <th>Action</th>
+    </tr>
+    <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+        <tr>
+            <td><?php echo $row['id_produk']; ?></td>
+            <td><?php echo $row['productDisplayName']; ?></td>
+            <td><?php echo $row['price']; ?></td>
+            <td>
+                <a href='edit_product.php?id=<?php echo $row['id_produk']; ?>'>Edit</a>
+                <a href='daftarproduk.php?remove=<?php echo $row['id_produk']; ?>'>Delete</a>
+            </td>              
+        </tr>
+    <?php endwhile; ?>
+</table>
+    <!-- Pagination links -->
+    <div class="pagination">
+        <select onchange="loadContent('paginantion.php?page=' + this.value, 'main-course');">
+            <?php
+            for ($i = 1; $i <= $totalPages; $i++) {
+                echo "<option value='$i'";
+                if ($i == $currentPage) {
+                    echo " selected";
+                }
+                echo ">$i</option>";
+            }
+            ?>
+        </select>
+    </div>

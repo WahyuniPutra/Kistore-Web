@@ -1,0 +1,78 @@
+<?php
+include 'koneksi.php';
+
+// Handle user deletion
+if (isset($_GET["delete_user"])) {
+    $email = $_GET['email'];
+
+    // Prepare delete statement for tb_cart
+    $delete_cart_query = "DELETE FROM tb_cart WHERE email = ?";
+    $stmt_cart = mysqli_prepare($conn, $delete_cart_query);
+    mysqli_stmt_bind_param($stmt_cart, 's', $email);
+
+    // Prepare delete statement for tb_order_history
+    $delete_order_query = "DELETE FROM tb_order_history WHERE email = ?";
+    $stmt_order = mysqli_prepare($conn, $delete_order_query);
+    mysqli_stmt_bind_param($stmt_order, 's', $email);
+
+    // Prepare delete statement for tb_user_login
+    $delete_user_query = "DELETE FROM tb_user_login WHERE email = ?";
+    $stmt_user = mysqli_prepare($conn, $delete_user_query);
+    mysqli_stmt_bind_param($stmt_user, 's', $email);
+
+    // Execute deletion queries
+    if (mysqli_stmt_execute($stmt_cart) && mysqli_stmt_execute($stmt_order) && mysqli_stmt_execute($stmt_user)) {
+        // Redirect to dashboard after successful deletion
+        header("Location: dashboard.php");
+        exit();
+    } else {
+        echo "Error deleting record: " . mysqli_error($conn);
+    }
+}
+
+// Retrieve all user accounts
+$query = "SELECT * FROM tb_user_login";
+$result = mysqli_query($conn, $query);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <link rel="stylesheet" href="dashboard.css" />
+</head>
+
+<body>
+    <div class="main-top">
+        <h1>User Management</h1>
+    </div>
+    <section class="main-course">
+        <h1>User List</h1>
+        <div class="course-box1">
+            <table border="1" class="tabeluser">
+                <tr>
+                    <th id="um_username">Username</th>
+                    <th id="um_email">Email</th>
+                    <th id="um_delete">Action</th>
+                </tr>
+                <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+                    <tr>
+                        <td id="um_username"><?php echo htmlspecialchars($row['username']); ?></td>
+                        <td id="um_email"><?php echo htmlspecialchars($row['email']); ?></td>
+                        <td id="um_delete">
+                            <form method="get" action="user_management.php">
+                                <input type="hidden" name="email" value="<?php echo htmlspecialchars($row['email']); ?>">
+                                <button id="um_del_but" type="submit" name="delete_user" class="delete-btn">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </table>
+        </div>
+    </section>
+</body>
+
+</html>

@@ -1,0 +1,46 @@
+<?php
+include 'koneksi.php';
+
+// Pastikan kata kunci pencarian diterima dengan metode GET
+if(isset($_GET['keyword'])) {
+    // Membersihkan input dari karakter yang tidak diinginkan
+    $keyword = mysqli_real_escape_string($conn, $_GET['keyword']);
+
+    // Lakukan pencarian berdasarkan kata kunci di kolom productDisplayName
+    $query = "SELECT * FROM tb_produk WHERE productDisplayName LIKE '%$keyword%' LIMIT 22"; // Menambahkan LIMIT 12 di sini
+    $result = mysqli_query($conn, $query);
+
+    // Buat daftar produk yang sesuai dengan kata kunci
+    $output = '';
+    while($row = mysqli_fetch_assoc($result)) {
+        // Wrap each product suggestion with an anchor tag linking to the product detail page
+        $output .= '<a class="product" href="#" data-product-id="' . $row['id_produk'] . '">' . $row['productDisplayName'] . '</a><br>';
+    }
+    
+
+    // Kembalikan hasil pencarian dalam format HTML
+    echo $output;
+}
+?>
+
+
+    #search-results {
+      background-color: #fff;
+      border: 3px solid #ccc;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+      width: 300px;
+      max-height: 200px;
+      overflow-y: auto;
+      border-color: #ff523b; /* Change border color on focus */
+      font-size: 15px;
+      position: absolute; /* Ensure it's absolutely positioned */
+      z-index: 999; /* Set a high z-index value to bring it to the front */
+    }
+
+
+    .product:hover {
+      background-color: #f0f0f0; /* Warna latar belakang ketika dihover */
+    }
+
+    products.php

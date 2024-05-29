@@ -1,0 +1,19 @@
+<?php
+// load_content.php
+
+if(isset($_POST['page'])) {
+    $page = $_POST['page'];
+
+    if($page == 'home') {
+        // Logic untuk menampilkan grafik
+        // Contoh: $content = "<canvas id='myChart'></canvas>";
+        $content = "<canvas id='myChart'></canvas>";
+    } elseif($page == 'input') {
+        // Logic untuk menampilkan formulir input
+        // Contoh: $content = "<form method='post' action='process_input.php'>...</form>";
+        $content = "<form method='post' action='process_input.php'>...</form>";
+    }
+
+    echo $content;
+}
+?>

@@ -1,0 +1,15 @@
+<?php
+include 'koneksi.php';
+
+// Get the offset value from the AJAX request
+$offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+$limit = 10; // Number of products to load per request
+
+// Fetch additional products from the database based on the offset
+$query = "SELECT * FROM tb_produk LIMIT $offset, $limit";
+$sql = mysqli_query($conn, $query);
+
+// Generate HTML content for the additional products
+while ($result = mysqli_fetch_assoc($sql)) {
+    // Your existing HTML rendering code for products
+}

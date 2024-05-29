@@ -1,0 +1,91 @@
+<?php
+include 'koneksi.php';
+
+// Cek apakah form telah disubmit
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Ambil nilai dari form
+    $id_produk = $_POST['id_produk'];
+    $articleType = $_POST['articleType'];
+    $usageType = $_POST['usageType'];
+    $productDisplayName = $_POST['productDisplayName'];
+
+    // Ambil nilai gambar
+    if (!empty($_FILES['image']['name'])) {
+        $image = $_FILES['image']['name'];
+        // Pindahkan file gambar ke folder "images"
+        $target_dir = "images/";
+        $target_file = $target_dir . basename($_FILES["image"]["name"]);
+        move_uploaded_file($_FILES['image']['tmp_name'], $target_file);
+        // Set nilai $image sesuai dengan path lengkap file gambar
+        $image = "images/" . $image;
+    } elseif (!empty($_POST['image_link'])) {
+        $image_link = $_POST['image_link'];
+        // Jika pengguna memasukkan tautan gambar, gunakan tautan tersebut
+        $image = $image_link;
+    } else {
+        // Tidak ada gambar yang diunggah atau dihubungkan
+        $image = ""; // atau berikan nilai default sesuai kebutuhan
+    }
+
+
+    $price = $_POST['price'];
+    $productDescription = $_POST['productDescription'];
+
+    // Query untuk memeriksa keberadaan id_produk
+    $check_query = "SELECT * FROM tb_produk WHERE id_produk = '$id_produk'";
+    $check_result = mysqli_query($conn, $check_query);
+    if (mysqli_num_rows($check_result) > 0) {
+        echo '<script>alert("Id Produk Sudah Ada"); window.location.href = "dashboard.php";</script>';
+        exit(); // Penting untuk menghentikan eksekusi script setelah alert
+    } else {
+        // Query untuk menambahkan data ke dalam tabel tb_produk
+        $query = "INSERT INTO tb_produk (id_produk, articleType, usageType, productDisplayName, image, price, productDescription) 
+                  VALUES ('$id_produk', '$articleType', '$usageType', '$productDisplayName', '$image', $price, '$productDescription')";
+        // Jalankan query
+        if (mysqli_query($conn, $query)) {
+            echo '<script>alert("Data berhasil ditambahkan"); window.location.href = "dashboard.php";</script>';
+            exit(); // Penting untuk menghentikan eksekusi script setelah alert
+        } else {
+            echo '<script>alert("Data Gagal Ditambahkan"); window.location.href = "dashboard.php";</script>';
+            exit(); // Penting untuk menghentikan eksekusi script setelah alert
+        }
+    }
+}
+?>
+
+<div class="main-top">
+    <h1>Input</h1>
+</div>
+<section class="main-course">
+    <h1>Formulir Input Produk</h1>
+    <div class="course-box1">
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
+            <!-- Input hidden untuk id_produk -->
+            <label for="id_produk">ID Produk:</label>
+            <input class="inputAtribut" type="text" id="id_produk" name="id_produk"><br>
+
+            <label for="articleType">Article Type:</label>
+            <input class="inputAtribut" type="text" id="articleType" name="articleType"><br>
+
+            <label for="usageType">Usage Type:</label>
+            <input class="inputAtribut" type="text" id="usageType" name="usageType"><br>
+
+            <label for="productDisplayName">Product Display Name:</label>
+            <input class="inputAtribut" type="text" id="productDisplayName" name="productDisplayName"><br>
+
+            <!-- Input file untuk unggah gambar -->
+            <label for="image">Image (Upload or Link):</label>
+            <input class="inputAtribut" type="file" id="image" name="image">
+            <p>Atau</p>
+            <input class="inputAtribut" type="text" id="image_link" name="image_link" placeholder="Link Gambar"><br>
+
+            <label for="price">Price:</label>
+            <input class="inputAtribut" type="text" id="price" name="price" value="1"><br>
+
+            <label for="productDescription">Product Description:</label>
+            <textarea style="resize: none" class="inputAtribut" id="productDescription" name="productDescription"></textarea><br><br>
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</section>
